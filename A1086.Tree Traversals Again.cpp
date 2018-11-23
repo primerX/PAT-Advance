@@ -1,73 +1,78 @@
-#include<iostream>
-#include<algorithm>
-#include<stack>
-#include<cstring>
+#include <iostream>
+#include <stack>
+#include <cstring>
 using namespace std;
 
-const int MAXN = 30;
+const int MAXN = 30;	//最大结点个数 
 
-struct node{
+struct node{	// 定义二叉树的结点 
 	int data;
 	node *lchild, *rchild;
 };
 
-int pre[MAXN], in[MAXN], post[MAXN];	//先序，中序，后序
-int n;		// 结点个数 
- 
-// 当前二叉树的先序序列为[preL, preR], 中序序列区间为[inL, inR]
-// 返回的是二叉树的根结点的地址
+// 结点个数，先序序列，中序序列 
+int n, preOrder[MAXN], inOrder[MAXN];
+
+// 根据先序序列[preL, preR]，中序序列[inL, inR]
+// 构造一颗二叉树，该函数返回根结点地址
 node* create(int preL, int preR, int inL, int inR)
 {
-	if(preL > preR){
-		return NULL;	//先序序列长度 <= 0时，直接返回 
-	}
-	node* root = new node;		//新建一个新的结点
-	root->data = pre[preL];
+	if(preL > preR) return NULL;	// 递归边界
+	// 新建一个根结点 
+	node *root = new node; 
+	root->data = preOrder[preL];
+	root->lchild = root->rchild = NULL;
 	int k;
+	// 用 k 来存储根结点的下标 
 	for(k = inL; k <= inR; k++){
-		//在中序序列中找到根结点的位置 
-		if(in[k] == pre[preL]) break;
+		if(inOrder[k] == preOrder[preL]) break;
 	}
-	int numLeft = k - inL;		//左子树的结点个数
+	// 左子树的结点个数
+	int numLeft = k - inL;
+	// 递归创建左子树 
 	root->lchild = create(preL+1, preL+numLeft, inL, k-1);
+	// 递归创建右子树
 	root->rchild = create(preL+numLeft+1, preR, k+1, inR);
-	return root;	//返回根结点的地址 
- } 
- 
-int num = 0;	//已经输出的结点个数, 用来控制输出格式
-void postorder(node* root)	//后序遍历 
-{
-	if(root == NULL){
-		return;
-	}
-	postorder(root->lchild);
-	postorder(root->rchild);
-	printf("%d", root->data);
-	num++;
-	if(num < n){
-		printf(" ");
-	}
+	// 返回根结点地址
+	return root; 
 }
 
+// 后序遍历
+int num = 0;		// 用来控制输出格式 
+void postOrder(node *root)
+{
+	if(root == NULL){ // 树为空 
+		return;
+	}
+	// 访问左子树 
+	postOrder(root->lchild);
+	// 访问右子树
+	postOrder(root->rchild);
+	// 访问根结点
+	printf("%d", root->data);
+	num++;
+	if(num < n) printf(" ");
+}
 
 int main()
 {
 	scanf("%d", &n);
-	string str;
+	char str[5];
 	stack<int> st;
-	int x, preIndex = 0, inIndex = 0;	//入栈元素，先序序列位置和中序序列位置 
-	for(int i = 0; i < 2*n; i++){	// 出栈入栈共 2*n 次 
-		cin >> str;
-		if(str == "Push"){		//入栈
+	// 入栈元素，先序序列位置，后序序列位置 
+	int x = 0, preIndex = 0, inIndex = 0;
+	for(int i = 0; i < 2*n; i++){
+		scanf("%s", &str);
+		if(strcmp(str, "Push") == 0){	//入栈
 			scanf("%d", &x);
-			pre[preIndex++] = x;
-			st.push(x); 
-		}else{			//出栈 
-			in[inIndex++] = st.top();
+			st.push(x);
+			preOrder[preIndex++] = x; 
+		}else{		// 出栈
+			inOrder[inIndex++] = st.top();
 			st.pop(); 
 		}
 	}
-	node* root = create(0, n-1, 0, n-1);	//建树
-	postorder(root);		//后序遍历 
+	node *root = create(0, n-1, 0, n-1); // 键树 
+	postOrder(root);	// 后序遍历 
 	return 0;
 }

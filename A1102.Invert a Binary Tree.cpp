@@ -1,18 +1,19 @@
-#include<iostream>
-#include<queue>
-#include<algorithm>
+#include <iostream>
+#include <queue>
 using namespace std;
 
-const int MAXN = 10;	//最大结点数
+const int MAXN = 10;	// 最大结点数 
 
-struct Node{		//二叉树的静态写法 
-	int lchild, rchild; 
-}node[MAXN]; 
+// 定义二叉树的静态结构 
+struct Node{
+	int data, lchild, rchild;
+}node[MAXN];
 
-bool notRoot[MAXN] = {false};	//记录当前结点是否不是根结点，初始时都为根结点
-int n, num = 0;		//n 为结点个数，num 为当前输出的结点数
+// 记录是否不是根结点，初始时均是根结点 
+bool notRoot[MAXN] = {false}; 
+int n, num = 0;
 
-//print() 函数输出结点 id 的编号
+// 函数 print 输出结点 id 的编号 
 void print(int id)
 {
 	printf("%d", id);
@@ -21,75 +22,82 @@ void print(int id)
 	else printf("\n");
 }
 
-//中序遍历
-void inOrder(int root)
+// 利用后序遍历反转一颗二叉树 
+void postOrder(int root)
 {
-	if(root == -1) return;
-	inOrder(node[root].lchild);
-	print(root);
-	inOrder(node[root].rchild);
- }
+	if(root == -1) return;	// 空节点
+	// 访问左子树 
+	postOrder(node[root].lchild);
+	// 访问右子树 
+	postOrder(node[root].rchild);
+	// 交换左右结点 
+	swap(node[root].lchild, node[root].rchild);
+}
 
-// 层序遍历
+// 层序遍历 
 void layerOrder(int root)
 {
-	queue<int> q;		//队列q 里面存的是地址
+	queue<int> q;	// 队列里面存的是地址(在这里代表下标)
 	q.push(root);
 	while(!q.empty())
 	{
-		int now = q.front();	//取出队列首地址 
+		int now = q.front();	//取出队列首元素
 		q.pop();
 		print(now);
-		if(node[now].lchild != -1) q.push(node[now].lchild);	//左子树非空
-		if(node[now].rchild != -1) q.push(node[now].rchild);	//右子树非空 
-	 } 
- } 
- 
- 
- //后序遍历，用来反转二叉树
-void postOrder(int root)
+		if(node[now].lchild != -1) q.push(node[now].lchild);
+		if(node[now].rchild != -1) q.push(node[now].rchild);
+	}
+}
+
+// 中序遍历
+void inOrder(int root)
 {
 	if(root == -1){
 		return;
 	}
-	postOrder(node[root].lchild);
-	postOrder(node[root].rchild);
-	swap(node[root].lchild, node[root].rchild);	//交换左右孩子结点 
+	// 递归访问左子树 
+	inOrder(node[root].lchild);
+	// 访问根结点 
+	print(root);
+	// 访问右子树
+	inOrder(node[root].rchild); 
 }
 
-// 寻找根结点的编号 
+int strToNum(char c)
+{
+	if(c == '-') return -1;
+	else{
+		notRoot[c-'0'] = true;	// 标记c不是根结点
+		return c - '0'; 
+	}
+}
+
 int findRoot()
 {
 	for(int i = 0; i < n; i++){
+		// i 是根结点 
 		if(notRoot[i] == false){
 			return i;
 		}
 	}
 }
 
-// 将输入的字符转换为 -1 或结点编号 
-int stoNum(char c)
-{
-	if(c == '-') return -1;
-	else{
-		notRoot[c-'0'] = true;	//此节点不是根结点
-		return c - '0'; 
-	}
-}
-
 int main()
 {
-	char lchild, rchild;
-	scanf("%d", &n);	//结点个数
+	char c;
+	scanf("%d", &n);
+	int lchild, rchild;
 	for(int i = 0; i < n; i++){
-		getchar();		//吸收换行符 
+		getchar();	//吸收换行符 
 		scanf("%c %c", &lchild, &rchild);
-		node[i].lchild = stoNum(lchild);
-		node[i].rchild = stoNum(rchild);
+		node[i].lchild = strToNum(lchild);
+		node[i].rchild = strToNum(rchild);
 	}
-	int root = findRoot();	//获得根结点的编号
-	postOrder(root);		//后序遍历，反转二叉树
-	layerOrder(root);		//输出层序遍历序列
-	num = 0;	//将输出的结点个数置为 ）
-	inOrder(root);		//输出中序遍历的序列 
- } 
+	int root = findRoot();	//获取根结点编号 
+	// 反转二叉树 
+	postOrder(root);	// 根结点的下标为 0 
+	layerOrder(root);	// 层序遍历 
+	num = 0;
+	inOrder(root);		// 中序遍历 
+	return 0;
+}
