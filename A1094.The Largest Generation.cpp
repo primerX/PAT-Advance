@@ -8,7 +8,6 @@ vector<int> child[MAXN];
 // 用来记录每层的结点个数 
 int hashTable[MAXN] = {0};
 
-
 void DFS(int index, int depth)
 {
 	hashTable[depth]++;	// 改层的个数加 1 
