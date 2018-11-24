@@ -1,40 +1,45 @@
-#include<iostream>
-#include<vector>
-#include<algorithm>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
-const int MAXN = 100;
-vector<int> G[MAXN];	//用来存放树 
-int leaf[MAXN] = {0};		// 用来存放每层的叶子结点个数
-int max_depth = 1;			//树的深度
+const int MAXN = 100;	// 结点的最大数量 
+//node[i] 盛放 i 的 孩子结点编号 
+vector<int> node[MAXN];	// 用来存放树 
+//hashTable 用来存放每一层的叶子节点个数 
+int hashTable[MAXN] = {0};
+int high = 1;		// 用来记录输的高度	
 
 void DFS(int index, int depth)
 {
-	max_depth = max(depth, max_depth);
-	if(G[index].size() == 0){	//该结点为叶子结点
-		leaf[depth]++;		//该层的叶子结点数加 1
-		return; 
+	high = max(high, depth);
+	if(node[index].size() == 0){	// 该结点是叶子结点 
+		hashTable[depth]++;
+		return;
 	}
-	for(int i = 0; i < G[index].size(); i++){
-		DFS(G[index][i], depth + 1);
+	for(int i = 0; i < node[index].size(); i++){
+		// 递归访问 index 的孩子结点 
+		DFS(node[index][i], depth + 1);
 	}
 }
 
 int main()
 {
-	int n, m, parent, child, k;
+	int n, m;
 	scanf("%d %d", &n, &m);
+	int father, k, child;
 	for(int i = 0; i < m; i++){
-		scanf("%d %d", &parent, &k);	//父节点编号，子结点个数
+		// 输入父亲结点编号, 节点个数 
+		scanf("%d %d", &father, &k);
 		for(int j = 0; j < k; j++){
 			scanf("%d", &child);
-			G[parent].push_back(child);
-		} 
+			node[father].push_back(child);
+		}
 	}
-	DFS(1, 1);		//初始时根结点编号为1 深度为 1
-	printf("%d", leaf[1]);
-	for(int i = 2; i <= max_depth; i++){
-		printf(" %d", leaf[i]);
+	DFS(1, 1);	// 初始入口,根结点编号为 0，深度为 1
+	printf("%d", hashTable[1]);	// 根结点编号从 1 开始
+	for(int i = 2; i <= high; i++){
+		printf(" %d", hashTable[i]);
 	} 
 	return 0;
 }
